@@ -73,4 +73,41 @@ ip dhcp snooping information option allow-untrusted  \
 end  \
 write memory
 
+# Задание 2.
 
+По топологии из задания 1 необходимо на SW2 настроить ARP Inspection и IP Source guard для Client9 и Client10, подключенных к SW2. Client9 получает адрес по DHCP, Client10 ip адрес задан статически. DHCP Snooping уже настроен по первому заданию.
+
+Перечислите список команд, которые необходимо применить на SW2
+
+Команды для SW2:
+
+1. Глобальное включение DAI и настройка VLAN
+
+enable  \
+configure terminal  \
+ip arp inspection vlan 1  \
+ip arp inspection validate src-mac dst-mac ip
+
+2. Настройка доверенных портов для DAI
+
+interface gigabitEthernet 0/0  \
+ ip arp inspection trust  \
+ exit
+
+3. Настройка порта для Client9 (DHCP)
+   
+interface gigabitEthernet 0/1  \
+ ip verify source vlan dhcp-snooping  \
+ ip arp inspection limit rate 15  \
+ no ip arp inspection trust  \
+ exit
+
+ 4. Настройка порта для Client10 (статический IP)
+
+ip source binding 192.168.1.100 aaaa.bbbb.cccc vlan 1 interface gigabitEthernet 0/2
+
+interface gigabitEthernet 0/2  \
+ ip verify source vlan dhcp-snooping  \
+ ip arp inspection limit rate 15  \
+ no ip arp inspection trust  \
+ exit
